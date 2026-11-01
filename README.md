@@ -272,14 +272,22 @@ Para verificar o frontend com o ESLint:
 cd frontend
 npm run lint
 ```
+## 11. Acesso para demonstração
 
-## 11. Repositório
+O sistema possui dois perfis de acesso:
+
+- **Cliente:** permite consultar automóveis, criar solicitações e acompanhar contratos.
+- **Agente:** permite cadastrar automóveis e avaliar solicitações de aluguel.
+
+As credenciais de demonstração serão disponibilizadas durante a apresentação do projeto.
+
+## 12. Repositório
 
 O código-fonte do projeto está disponível no GitHub:
 
 [https://github.com/GiovanniArenare/Alugar-Carros](https://github.com/GiovanniArenare/Alugar-Carros)
 
-## 12. Autor
+## 13. Autor
 
 **Giovanni Arenare**
 
@@ -287,12 +295,12 @@ Estudante de Engenharia de Software — PUC Minas.
 
 GitHub: [@GiovanniArenare](https://github.com/GiovanniArenare)
 
-## 13. Agradecimentos
+## 14. Agradecimentos
 
 Projeto desenvolvido como atividade acadêmica da disciplina Desenvolvimento e Integração de Aplicações Web, do curso de Engenharia de Software da PUC Minas.
 
 Agradecimentos aos professores e a todos que contribuíram para o desenvolvimento do projeto.
 
-## 14. Licença
+## 15. Licença
 
 Este projeto foi desenvolvido para fins acadêmicos.
