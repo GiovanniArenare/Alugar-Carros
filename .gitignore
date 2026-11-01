@@ -1,0 +1,40 @@
+
+# Node.js / React / Vite
+node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Java / Maven / Spring Boot
+backend/**/target/
+*.class
+*.jar
+*.war
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+!.env.example
+application-local.properties
+
+# Logs
+*.log
+
+# Arquivos de erros
+**/erro-backend.txt

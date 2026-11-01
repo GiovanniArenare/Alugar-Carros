@@ -1,0 +1,127 @@
+
+.cadastro-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+  background: #F5F5F5;
+}
+
+.cadastro-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 40px;
+  background: #FFFFFF;
+  border-radius: 14px;
+  border: 1px solid #E5E5E5;
+  border-top: 5px solid #FFC928;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+.cadastro-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.cadastro-header h1 {
+  color: #242424;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 16px;
+}
+
+.cadastro-header p {
+  font-size: 22px;
+  font-weight: 700;
+  color: #242424;
+  margin: 0 0 8px;
+}
+
+.cadastro-header span {
+  color: #777777;
+  font-size: 14px;
+}
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+.cadastro-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cadastro-form label {
+  font-weight: 700;
+  color: #303030;
+  font-size: 14px;
+}
+
+.cadastro-form input,
+.cadastro-form select {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #D5D5D5;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: #FFFFFF;
+  color: #242424;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cadastro-form input:focus,
+.cadastro-form select:focus {
+  border-color: #D5A600;
+  box-shadow: 0 0 0 3px rgba(255, 201, 40, 0.2);
+}
+
+.cadastro-form button {
+  padding: 14px;
+  background: #FFC928;
+  color: #242424;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.cadastro-form button:hover {
+  background: #E8B400;
+  transform: translateY(-1px);
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 14px;
+  color: #777777;
+}
+
+.login-link a {
+  color: #765900;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .cadastro-card {
+    padding: 28px 22px;
+  }
+
+  .cadastro-header h1 {
+    font-size: 28px;
+  }
+}
