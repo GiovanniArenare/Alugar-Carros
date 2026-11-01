@@ -1,9 +1,7 @@
 
 import { useEffect, useState } from "react";
-import { buscarUsuarioAtual } from "../services/api";
+import { buscarUsuarioAtual, API_URL } from "../services/api";
 import "./Cliente.css";
-
-const API_URL = "http://localhost:8080/api";
 
 function Cliente() {
   const [usuario, setUsuario] = useState(null);

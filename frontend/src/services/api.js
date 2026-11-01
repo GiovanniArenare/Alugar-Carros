@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 export async function cadastrarUsuario(dados) {
   const resposta = await fetch(`${API_URL}/usuarios/cadastro`, {
@@ -52,6 +53,7 @@ export async function fazerLogout() {
 
   return resultado;
 }
+
 export async function buscarUsuarioAtual() {
   const resposta = await fetch(`${API_URL}/usuarios/me`, {
     method: "GET",
