@@ -7,6 +7,7 @@ import Cadastro from "./pages/Cadastro";
 import Cliente from "./pages/Cliente";
 import Agente from "./pages/Agente";
 
+import SideRays from "./components/SideRays";
 import { buscarUsuarioAtual } from "./services/api";
 
 function RotaProtegida({ tipoPermitido, children }) {
@@ -54,31 +55,59 @@ function RotaProtegida({ tipoPermitido, children }) {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+      <div className="app-shell">
+        <div className="app-background">
+          <SideRays
+            rayColor1="#ffd000"
+            rayColor2="#ffd000"
+            origin="top-right"
+            speed={2.5}
+            intensity={2}
+            spread={2}
+            density={5}
+            followMouse={false}
+            blend={0.5}
+            sharpness={0.5}
+            tilt={0}
+            falloff={1.6}
+            glow={1}
+            saturation={1}
+            dust={0}
+            mouseInfluence={0.5}
+            intro={false}
+            lightMode={false}
+            opacity={1}
+          />
+        </div>
 
-        <Route path="/login" element={<Login />} />
+        <div className="app-content">
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route path="/cadastro" element={<Cadastro />} />
+            <Route path="/login" element={<Login />} />
 
-        <Route
-          path="/cliente"
-          element={
-            <RotaProtegida tipoPermitido="CLIENTE">
-              <Cliente />
-            </RotaProtegida>
-          }
-        />
+            <Route path="/cadastro" element={<Cadastro />} />
 
-        <Route
-          path="/agente"
-          element={
-            <RotaProtegida tipoPermitido="AGENTE">
-              <Agente />
-            </RotaProtegida>
-          }
-        />
-      </Routes>
+            <Route
+              path="/cliente"
+              element={
+                <RotaProtegida tipoPermitido="CLIENTE">
+                  <Cliente />
+                </RotaProtegida>
+              }
+            />
+
+            <Route
+              path="/agente"
+              element={
+                <RotaProtegida tipoPermitido="AGENTE">
+                  <Agente />
+                </RotaProtegida>
+              }
+            />
+          </Routes>
+        </div>
+      </div>
     </BrowserRouter>
   );
 }

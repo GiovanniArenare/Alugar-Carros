@@ -1,360 +1,605 @@
-
 .agente-page {
+  --amarelo: #FFD000;
+  --amarelo-hover: #E8BD00;
+  --fundo: #0B0B0B;
+  --superficie: #151515;
+  --borda: #2B2B2B;
+  --texto: #F5F5F5;
+  --texto-secundario: #999999;
+
   min-height: 100vh;
-  padding: 40px 24px;
-  background: #F5F5F5;
-  color: #242424;
+  padding: 0 0 30px;
+  background: transparent;
+  color: var(--texto);
+  font-family: inherit;
 }
 
 .agente-container {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1320px;
   margin: 0 auto;
+  padding: 38px 32px 0;
 }
 
-.agente-header {
-  padding: 32px;
-  margin-bottom: 28px;
-  background: #242424;
-  color: #FFFFFF;
-  border-radius: 14px;
-  border-left: 7px solid #FFC928;
+.agente-carregando {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: var(--texto-secundario);
+  font-size: 14px;
 }
 
-.agente-etiqueta {
+.agente-loading-icon {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #333;
+  border-top-color: var(--amarelo);
+  border-radius: 50%;
+  animation: agente-girar 0.8s linear infinite;
+}
+
+@keyframes agente-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.agente-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 65px;
+}
+
+.agente-resumo-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-width: 0;
+  padding: 23px 20px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #191919, #121212);
+  transition: border-color 0.25s, transform 0.25s;
+}
+
+.agente-resumo-card:hover {
+  border-color: rgba(255, 208, 0, 0.4);
+  transform: translateY(-3px);
+}
+
+.agente-resumo-icone {
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: rgba(255, 208, 0, 0.1);
+  color: var(--amarelo);
+  font-size: 21px;
+}
+
+.agente-resumo-icone.pendente {
+  background: rgba(233, 185, 73, 0.1);
+  color: #E9B949;
+}
+
+.agente-resumo-icone.aprovada {
+  background: rgba(72, 199, 142, 0.1);
+  color: #48C78E;
+}
+
+.agente-resumo-icone.recusada {
+  background: rgba(239, 98, 98, 0.1);
+  color: #EF7777;
+}
+
+.agente-resumo-card > div:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.agente-resumo-card span {
+  color: var(--texto-secundario);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.agente-resumo-card strong {
+  margin: 4px 0;
+  color: var(--texto);
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.agente-resumo-card small {
+  color: #686868;
+  font-size: 10px;
+}
+
+.agente-section {
+  margin-bottom: 65px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.agente-section-header {
+  margin-bottom: 25px;
+}
+
+.agente-section-etiqueta {
   display: inline-block;
   margin-bottom: 10px;
-  color: #FFC928;
-  font-size: 13px;
+  color: var(--amarelo);
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 2px;
 }
 
-.agente-header h1 {
-  margin: 0 0 12px;
-  font-size: 32px;
-}
-
-.agente-header p {
-  margin: 6px 0;
-  color: #E0E0E0;
-}
-
-.agente-section {
-  padding: 28px;
-  margin-bottom: 24px;
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
-}
-
-.agente-section-header {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #EEEEEE;
-}
-
 .agente-section-header h2 {
-  margin: 0 0 8px;
-  font-size: 22px;
+  margin: 0;
+  color: var(--texto);
+  font-size: clamp(23px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.8px;
 }
 
 .agente-section-header p {
-  margin: 0;
-  color: #777777;
-  font-size: 14px;
+  margin: 9px 0 0;
+  color: var(--texto-secundario);
+  font-size: 13px;
+  line-height: 1.7;
 }
 
-.agente-form {
+.agente-section-topo {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.agente-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.agente-campo {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.agente-campo label,
-.avaliacao-form label {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.agente-campo input,
-.avaliacao-form textarea {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #D5D5D5;
-  border-radius: 7px;
-  background: #FFFFFF;
-  color: #242424;
-  font: inherit;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.agente-campo input:focus,
-.avaliacao-form textarea:focus {
-  border-color: #D5A600;
-  box-shadow: 0 0 0 3px rgba(255, 201, 40, 0.2);
-}
-
-.agente-campo input {
-  min-height: 44px;
-}
-
-.avaliacao-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.avaliacao-form textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.agente-automoveis-grid,
-.agente-solicitacoes-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.agente-automovel-card,
-.agente-solicitacao-card {
-  padding: 20px;
-  border: 1px solid #E5E5E5;
-  border-radius: 10px;
-  background: #FFFFFF;
-}
-
-.agente-automovel-card {
-  border-top: 4px solid #FFC928;
-}
-
-.automovel-card-topo,
-.solicitacao-card-header {
-  display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 20px;
+  margin-bottom: 27px;
 }
 
-.automovel-etiqueta {
-  padding: 5px 10px;
-  border-radius: 5px;
-  background: #FFF3C4;
-  color: #765900;
-  font-size: 12px;
-  font-weight: 800;
+.agente-section-topo .agente-section-header {
+  margin-bottom: 0;
 }
 
-.automovel-matricula {
-  color: #777777;
-  font-size: 12px;
-}
-
-.agente-automovel-card h3,
-.agente-solicitacao-card h3 {
-  margin: 0 0 14px;
-  font-size: 18px;
-}
-
-.agente-automovel-card p,
-.agente-solicitacao-card p {
-  margin: 9px 0;
-  color: #555555;
-  font-size: 14px;
-  overflow-wrap: anywhere;
-}
-
-.agente-solicitacao-card strong,
-.agente-automovel-card strong {
-  color: #242424;
-}
-
-.automovel-acoes,
-.solicitacao-acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
+.agente-page button {
+  font-family: inherit;
 }
 
 .botao-principal,
 .botao-secundario,
 .botao-perigo {
   min-height: 42px;
-  padding: 10px 16px;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 17px;
+  border: 1px solid transparent;
   border-radius: 7px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
 }
 
 .botao-principal {
-  background: #FFC928;
-  color: #242424;
+  background: var(--amarelo);
+  color: #111111;
 }
 
 .botao-principal:hover {
-  background: #E8B400;
-  transform: translateY(-1px);
+  background: var(--amarelo-hover);
+  transform: translateY(-2px);
+}
+
+.botao-principal span {
+  font-size: 19px;
+  line-height: 1;
 }
 
 .botao-secundario {
-  background: #242424;
-  color: #FFFFFF;
+  border-color: #414141;
+  background: #222222;
+  color: #EAEAEA;
 }
 
 .botao-secundario:hover {
-  background: #444444;
+  border-color: var(--amarelo);
+  background: rgba(255, 208, 0, 0.08);
+  color: var(--amarelo);
 }
 
 .botao-perigo {
-  background: #FDE8E8;
-  color: #B42318;
+  border-color: rgba(239, 98, 98, 0.25);
+  background: rgba(239, 98, 98, 0.08);
+  color: #EF7777;
 }
 
 .botao-perigo:hover {
-  background: #F8D0D0;
+  border-color: #EF7777;
+  background: rgba(239, 98, 98, 0.16);
 }
 
-.agente-form-edicao {
-  margin-top: 20px;
-  padding: 18px;
-  border-radius: 8px;
-  background: #F7F7F7;
+.botao-principal:active,
+.botao-secundario:active,
+.botao-perigo:active {
+  transform: scale(0.98);
 }
 
-.agente-form-edicao h4 {
-  margin: 0 0 4px;
+.agente-automoveis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
 }
 
-.agente-solicitacao-card {
-  border-left: 4px solid #D5D5D5;
+.agente-automovel-card {
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid var(--borda);
+  border-radius: 11px;
+  background: linear-gradient(145deg, #191919, #131313);
+  transition: border-color 0.25s, transform 0.25s;
 }
 
-.solicitacao-card-header h3 {
-  margin: 0;
+.agente-automovel-card:hover {
+  border-color: rgba(255, 208, 0, 0.4);
+  transform: translateY(-3px);
 }
 
-.status {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 20px;
+.automovel-card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.automovel-etiqueta {
+  padding: 5px 9px;
+  border-radius: 5px;
+  background: rgba(255, 208, 0, 0.1);
+  color: var(--amarelo);
   font-size: 11px;
+  font-weight: 700;
+}
+
+.automovel-matricula {
+  color: #777777;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.automovel-card-info {
+  padding: 20px 0;
+}
+
+.automovel-card-label {
+  color: #777777;
+  font-size: 9px;
   font-weight: 800;
-  white-space: nowrap;
+  letter-spacing: 1.5px;
 }
 
-.status-PENDENTE {
-  background: #FFF3C4;
-  color: #765900;
+.automovel-card-info h3 {
+  margin: 8px 0 10px;
+  color: var(--texto);
+  font-size: 19px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-.status-EM_ANALISE {
-  background: #E5EFFF;
-  color: #2455A4;
+.automovel-card-info p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 12px;
 }
 
-.status-APROVADA {
-  background: #DDF5E5;
-  color: #176B36;
+.automovel-card-info p strong {
+  color: #D5D5D5;
 }
 
-.status-RECUSADA {
-  background: #FDE8E8;
-  color: #B42318;
+.automovel-acoes {
+  display: flex;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid var(--borda);
 }
 
-.status-CANCELADA {
-  background: #EEEEEE;
-  color: #555555;
+.automovel-acoes button {
+  flex: 1;
 }
 
 .agente-vazio {
-  padding: 18px;
-  border-radius: 8px;
-  background: #F7F7F7;
-  color: #777777;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 35px 20px;
+  border: 1px dashed #363636;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.015);
   text-align: center;
 }
 
-.agente-erro,
-.agente-sucesso {
-  padding: 14px 18px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  font-size: 14px;
+.agente-vazio > span {
+  margin-bottom: 14px;
+  font-size: 31px;
+  filter: grayscale(0.4);
 }
 
-.agente-erro {
-  background: #FDE8E8;
-  color: #B42318;
-  border: 1px solid #F5C2C2;
+.agente-vazio h3 {
+  margin: 0;
+  color: #EAEAEA;
+  font-size: 16px;
 }
 
-.agente-sucesso {
-  background: #DDF5E5;
-  color: #176B36;
-  border: 1px solid #B8E5C5;
+.agente-vazio p {
+  max-width: 380px;
+  margin: 9px 0 0;
+  color: var(--texto-secundario);
+  font-size: 12px;
+  line-height: 1.7;
 }
 
-.agente-carregando {
-  max-width: 1100px;
-  margin: 40px auto;
-  color: #555555;
-  text-align: center;
+.agente-abas {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 34px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.agente-aba {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 2px 15px;
+  border: none;
+  background: transparent;
+  color: #888888;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.agente-aba:hover {
+  color: #EAEAEA;
+}
+
+.agente-aba-ativa {
+  color: var(--amarelo);
+}
+
+.agente-aba-ativa::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--amarelo);
+  content: "";
+}
+
+.agente-aba-contador {
+  min-width: 21px;
+  height: 21px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: #252525;
+  color: #AAAAAA;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.agente-aba-ativa .agente-aba-contador {
+  background: rgba(255, 208, 0, 0.12);
+  color: var(--amarelo);
+}
+
+.agente-painel-abas {
+  padding-top: 25px;
+}
+
+.agente-painel-descricao {
+  margin-bottom: 22px;
+}
+
+.agente-painel-descricao h3 {
+  margin: 0;
+  color: #EEEEEE;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.agente-painel-descricao p {
+  margin: 7px 0 0;
+  color: var(--texto-secundario);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.agente-solicitacoes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.agente-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding-top: 22px;
+  border-top: 1px solid var(--borda);
+}
+
+.agente-footer span {
+  color: var(--amarelo);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.agente-footer p {
+  margin: 0;
+  color: #686868;
+  font-size: 11px;
+}
+
+.automoveis-paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.automoveis-paginacao span {
+  color: #999999;
+  font-size: 12px;
+}
+
+.automoveis-paginacao span strong {
+  color: #F5F5F5;
+}
+
+.paginacao-botao {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #383838;
+  border-radius: 7px;
+  background: #171717;
+  color: #F5F5F5;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.paginacao-botao:hover:not(:disabled) {
+  border-color: #FFD000;
+  color: #FFD000;
+}
+
+.paginacao-botao:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1100px) {
+  .agente-resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .agente-automoveis-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
-  .agente-page {
-    padding: 20px 14px;
+  .agente-container {
+    padding: 30px 22px 0;
   }
 
-  .agente-header,
+  .agente-resumo {
+    margin-bottom: 48px;
+  }
+
   .agente-section {
-    padding: 20px;
+    margin-bottom: 50px;
   }
 
-  .agente-header h1 {
-    font-size: 26px;
-  }
-
-  .agente-form-grid,
-  .agente-automoveis-grid,
-  .agente-solicitacoes-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .solicitacao-card-header {
+  .agente-section-topo {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .automovel-acoes,
-  .solicitacao-acoes {
-    flex-direction: column;
+  .agente-solicitacoes-grid {
+    grid-template-columns: 1fr;
   }
 
-  .automovel-acoes button,
-  .solicitacao-acoes button {
+  .agente-abas {
+    gap: 20px;
+    overflow-x: auto;
+  }
+
+  .agente-aba {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .agente-container {
+    padding: 25px 16px 0;
+  }
+
+  .agente-resumo {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 42px;
+  }
+
+  .agente-resumo-card {
+    gap: 10px;
+    padding: 15px 12px;
+  }
+
+  .agente-resumo-icone {
+    width: 35px;
+    height: 35px;
+    font-size: 17px;
+  }
+
+  .agente-resumo-card strong {
+    font-size: 23px;
+  }
+
+  .agente-resumo-card small {
+    font-size: 9px;
+  }
+
+  .agente-section-header h2 {
+    font-size: 23px;
+  }
+
+  .agente-section-topo > button {
     width: 100%;
+  }
+
+  .agente-automoveis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .agente-aba {
+    font-size: 11px;
+  }
+
+  .agente-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+    .automoveis-paginacao {
+    gap: 10px;
+  }
+
+  .paginacao-botao {
+    padding: 0 10px;
+    font-size: 10px;
   }
 }

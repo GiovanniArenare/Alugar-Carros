@@ -1,0 +1,198 @@
+
+.agente-solicitacao-card {
+  box-sizing: border-box;
+  display: block;
+  width: min(100%, 760px);
+  max-width: 760px;
+  min-width: 0;
+  align-self: flex-start;
+  justify-self: start;
+  margin-right: auto;
+  padding: 24px;
+  border: 1px solid #303030;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #1B1B1B, #151515);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.agente-solicitacao-card:hover {
+  border-color: rgba(255, 208, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+.agente-solicitacao-card .solicitacao-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #303030;
+}
+
+.agente-solicitacao-card .solicitacao-card-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #FFD000;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.agente-solicitacao-card .solicitacao-card-header h3 {
+  margin: 0;
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.agente-solicitacao-card .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 7px 11px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.agente-solicitacao-card .status-indicador {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.agente-solicitacao-card .status-pendente {
+  border-color: rgba(233, 185, 73, 0.2);
+  background: rgba(233, 185, 73, 0.1);
+  color: #E9B949;
+}
+
+.agente-solicitacao-card .status-aprovada {
+  border-color: rgba(72, 199, 142, 0.2);
+  background: rgba(72, 199, 142, 0.1);
+  color: #48C78E;
+}
+
+.agente-solicitacao-card .status-recusada {
+  border-color: rgba(239, 98, 98, 0.2);
+  background: rgba(239, 98, 98, 0.1);
+  color: #EF7777;
+}
+
+.agente-solicitacao-card .solicitacao-dados {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+  padding: 20px 0;
+}
+
+.agente-solicitacao-card .solicitacao-dado {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.agente-solicitacao-card .solicitacao-dado span,
+.agente-solicitacao-card .solicitacao-parecer > span {
+  color: #999999;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.agente-solicitacao-card .solicitacao-dado strong {
+  overflow-wrap: anywhere;
+  color: #E8E8E8;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.agente-solicitacao-card .solicitacao-parecer {
+  padding: 15px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: #171717;
+}
+
+.agente-solicitacao-card .solicitacao-parecer p {
+  margin: 9px 0 0;
+  color: #BDBDBD;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.agente-solicitacao-card .avaliacao-form {
+  padding-top: 20px;
+  border-top: 1px solid #303030;
+}
+
+.agente-solicitacao-card .avaliacao-form label {
+  display: block;
+  margin-bottom: 10px;
+  color: #E5E5E5;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.agente-solicitacao-card .avaliacao-form textarea {
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #383838;
+  border-radius: 8px;
+  outline: none;
+  background: #101010;
+  color: #F5F5F5;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.agente-solicitacao-card .avaliacao-form textarea::placeholder {
+  color: #777777;
+}
+
+.agente-solicitacao-card .avaliacao-form textarea:focus {
+  border-color: #FFD000;
+  box-shadow: 0 0 0 3px rgba(255, 208, 0, 0.08);
+}
+
+.agente-solicitacao-card .solicitacao-acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.agente-solicitacao-card .solicitacao-acoes button {
+  flex: 1;
+  min-height: 40px;
+}
+
+@media (max-width: 520px) {
+  .agente-solicitacao-card {
+    padding: 18px;
+  }
+
+  .agente-solicitacao-card .solicitacao-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .agente-solicitacao-card .solicitacao-dados {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .agente-solicitacao-card .solicitacao-acoes {
+    flex-direction: column;
+  }
+}

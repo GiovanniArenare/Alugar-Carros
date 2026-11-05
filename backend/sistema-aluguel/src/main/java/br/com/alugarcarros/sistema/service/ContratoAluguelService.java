@@ -67,4 +67,11 @@ public class ContratoAluguelService {
                 new IllegalArgumentException("Contrato nao encontrado.")
             );
     }
+
+    public ContratoAluguel buscarPorId(Long id) {
+        return contratoRepository.findById(id)
+            .orElseThrow(() ->
+                new IllegalArgumentException("Contrato nao encontrado.")
+            );
+    }
 }

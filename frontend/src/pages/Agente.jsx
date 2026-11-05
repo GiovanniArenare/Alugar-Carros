@@ -1,6 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { buscarUsuarioAtual, API_URL } from "../services/api";
+import Navbar from "../components/Navbar";
+import Notificacao from "../components/Notificacao";
+import CardSolicitacao from "../components/CardSolicitacao";
+import AutomovelModal from "../components/AutomovelModal";
+import "../components/Notificacao.css";
 import "./Agente.css";
 
 function Agente() {
@@ -10,21 +14,39 @@ function Agente() {
   const [recusadas, setRecusadas] = useState([]);
   const [automoveis, setAutomoveis] = useState([]);
 
+  const [abaAtiva, setAbaAtiva] = useState("pendentes");
   const [pareceres, setPareceres] = useState({});
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
 
-  const [matricula, setMatricula] = useState("");
-  const [ano, setAno] = useState("");
-  const [marca, setMarca] = useState("");
-  const [modelo, setModelo] = useState("");
-  const [placa, setPlaca] = useState("");
+  const [modalAutomovel, setModalAutomovel] = useState(undefined);
 
-  const [automovelEdicao, setAutomovelEdicao] = useState(null);
-  const [anoEdicao, setAnoEdicao] = useState("");
-  const [marcaEdicao, setMarcaEdicao] = useState("");
-  const [modeloEdicao, setModeloEdicao] = useState("");
+  // Paginação dos automóveis
+  const [paginaAutomoveis, setPaginaAutomoveis] = useState(1);
+  const AUTOMOVEIS_POR_PAGINA = 6;
+
+  const totalPaginasAutomoveis = Math.ceil(
+    automoveis.length / AUTOMOVEIS_POR_PAGINA
+  );
+
+  const indiceInicial =
+    (paginaAutomoveis - 1) * AUTOMOVEIS_POR_PAGINA;
+
+  const automoveisPaginados = automoveis.slice(
+    indiceInicial,
+    indiceInicial + AUTOMOVEIS_POR_PAGINA
+  );
+
+  function notificarSucesso(texto) {
+    setErro("");
+    setMensagem(texto);
+  }
+
+  function notificarErro(texto) {
+    setMensagem("");
+    setErro(texto);
+  }
 
   async function buscarSolicitacoes(tipo) {
     const resposta = await fetch(`${API_URL}/solicitacoes/${tipo}`, {
@@ -62,6 +84,16 @@ function Agente() {
 
     const dados = await resposta.json();
     setAutomoveis(dados);
+
+    // Evita permanecer em uma página que deixou de existir.
+    const ultimaPagina = Math.max(
+      1,
+      Math.ceil(dados.length / AUTOMOVEIS_POR_PAGINA)
+    );
+
+    setPaginaAutomoveis((paginaAtual) =>
+      Math.min(paginaAtual, ultimaPagina)
+    );
   }
 
   useEffect(() => {
@@ -75,7 +107,7 @@ function Agente() {
           carregarAutomoveis()
         ]);
       } catch (error) {
-        setErro(error.message);
+        notificarErro(error.message);
       } finally {
         setCarregando(false);
       }
@@ -84,97 +116,59 @@ function Agente() {
     carregarDados();
   }, []);
 
-  async function cadastrarAutomovel(event) {
-    event.preventDefault();
+  async function salvarAutomovel(dados) {
     setErro("");
     setMensagem("");
 
+    const editando = Boolean(modalAutomovel);
+
     try {
-      const resposta = await fetch(`${API_URL}/automoveis`, {
-        method: "POST",
+      const url = editando
+        ? `${API_URL}/automoveis/${modalAutomovel.id}`
+        : `${API_URL}/automoveis`;
+
+      const resposta = await fetch(url, {
+        method: editando ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json"
         },
         credentials: "include",
-        body: JSON.stringify({
-          matricula,
-          ano: Number(ano),
-          marca,
-          modelo,
-          placa
-        })
+        body: JSON.stringify(
+          editando
+            ? {
+                ano: dados.ano,
+                marca: dados.marca,
+                modelo: dados.modelo
+              }
+            : dados
+        )
       });
 
       const resultado = await resposta.json();
 
       if (!resposta.ok) {
-        throw new Error(resultado.erro || "Erro ao cadastrar automóvel.");
+        throw new Error(
+          resultado.erro ||
+          `Erro ao ${editando ? "editar" : "cadastrar"} automóvel.`
+        );
       }
 
-      setMensagem("Automóvel cadastrado com sucesso!");
+      setModalAutomovel(undefined);
 
-      setMatricula("");
-      setAno("");
-      setMarca("");
-      setModelo("");
-      setPlaca("");
+      // Ao cadastrar, volta para a primeira página.
+      if (!editando) {
+        setPaginaAutomoveis(1);
+      }
 
       await carregarAutomoveis();
-    } catch (error) {
-      setErro(error.message);
-    }
-  }
 
-  function iniciarEdicao(automovel) {
-    setAutomovelEdicao(automovel.id);
-    setAnoEdicao(String(automovel.ano));
-    setMarcaEdicao(automovel.marca);
-    setModeloEdicao(automovel.modelo);
-    setErro("");
-    setMensagem("");
-  }
-
-  function cancelarEdicao() {
-    setAutomovelEdicao(null);
-    setAnoEdicao("");
-    setMarcaEdicao("");
-    setModeloEdicao("");
-  }
-
-  async function salvarEdicao(event) {
-    event.preventDefault();
-    setErro("");
-    setMensagem("");
-
-    try {
-      const resposta = await fetch(
-        `${API_URL}/automoveis/${automovelEdicao}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            ano: Number(anoEdicao),
-            marca: marcaEdicao,
-            modelo: modeloEdicao
-          })
-        }
+      notificarSucesso(
+        editando
+          ? "Automóvel atualizado com sucesso!"
+          : "Automóvel cadastrado com sucesso!"
       );
-
-      const resultado = await resposta.json();
-
-      if (!resposta.ok) {
-        throw new Error(resultado.erro || "Erro ao editar automóvel.");
-      }
-
-      setMensagem("Automóvel atualizado com sucesso!");
-
-      cancelarEdicao();
-      await carregarAutomoveis();
     } catch (error) {
-      setErro(error.message);
+      notificarErro(error.message);
     }
   }
 
@@ -200,15 +194,10 @@ function Agente() {
         throw new Error(resultado.erro || "Erro ao excluir automóvel.");
       }
 
-      setMensagem("Automóvel excluído com sucesso!");
-
-      if (automovelEdicao === id) {
-        cancelarEdicao();
-      }
-
       await carregarAutomoveis();
+      notificarSucesso("Automóvel excluído com sucesso!");
     } catch (error) {
-      setErro(error.message);
+      notificarErro(error.message);
     }
   }
 
@@ -219,7 +208,7 @@ function Agente() {
     const parecer = pareceres[id];
 
     if (!parecer || !parecer.trim()) {
-      setErro("Informe o parecer financeiro antes de avaliar.");
+      notificarErro("Informe o parecer financeiro antes de avaliar.");
       return;
     }
 
@@ -245,351 +234,318 @@ function Agente() {
         throw new Error(resultado.erro || "Erro ao avaliar solicitação.");
       }
 
-      setMensagem(
-        `Solicitação ${id} ${
-          status === "APROVADA" ? "aprovada" : "recusada"
-        } com sucesso!`
-      );
-
       setPareceres((anteriores) => ({
         ...anteriores,
         [id]: ""
       }));
 
       await carregarSolicitacoes();
+
+      notificarSucesso(
+        `Solicitação ${id} ${
+          status === "APROVADA" ? "aprovada" : "recusada"
+        } com sucesso!`
+      );
     } catch (error) {
-      setErro(error.message);
+      notificarErro(error.message);
     }
   }
 
-  function renderSolicitacao(solicitacao, mostrarAvaliacao = false) {
-    return (
-      <article className="agente-solicitacao-card" key={solicitacao.id}>
-        <div className="solicitacao-card-header">
-          <h3>Solicitação #{solicitacao.id}</h3>
+  const abas = [
+    {
+      id: "pendentes",
+      titulo: "Pendentes",
+      quantidade: pendentes.length,
+      descricao: "Solicitações que aguardam análise financeira.",
+      dados: pendentes
+    },
+    {
+      id: "aprovadas",
+      titulo: "Aprovadas",
+      quantidade: aprovadas.length,
+      descricao: "Solicitações liberadas para contratação.",
+      dados: aprovadas
+    },
+    {
+      id: "recusadas",
+      titulo: "Recusadas",
+      quantidade: recusadas.length,
+      descricao: "Solicitações que não foram aprovadas.",
+      dados: recusadas
+    }
+  ];
 
-          <span
-            className={`status status-${solicitacao.status}`}
-          >
-            {solicitacao.status}
-          </span>
-        </div>
-
-        <p><strong>Cliente:</strong> #{solicitacao.clienteId}</p>
-
-        <p>
-          <strong>Automóvel:</strong> {solicitacao.marca}{" "}
-          {solicitacao.modelo}
-        </p>
-
-        <p><strong>Placa:</strong> {solicitacao.placa}</p>
-        <p><strong>Data de início:</strong> {solicitacao.dataInicio}</p>
-        <p><strong>Data de término:</strong> {solicitacao.dataFim}</p>
-
-        {!mostrarAvaliacao && (
-          <p>
-            <strong>Parecer financeiro:</strong>{" "}
-            {solicitacao.parecerFinanceiro || "Não informado."}
-          </p>
-        )}
-
-        {mostrarAvaliacao && (
-          <div className="avaliacao-form">
-            <label htmlFor={`parecer-${solicitacao.id}`}>
-              Parecer financeiro
-            </label>
-
-            <textarea
-              id={`parecer-${solicitacao.id}`}
-              rows="4"
-              value={pareceres[solicitacao.id] || ""}
-              onChange={(event) =>
-                setPareceres((anteriores) => ({
-                  ...anteriores,
-                  [solicitacao.id]: event.target.value
-                }))
-              }
-              placeholder="Digite o parecer da análise financeira..."
-            />
-
-            <div className="solicitacao-acoes">
-              <button
-                className="botao-principal"
-                type="button"
-                onClick={() =>
-                  avaliarSolicitacao(solicitacao.id, "APROVADA")
-                }
-              >
-                Aprovar solicitação
-              </button>
-
-              <button
-                className="botao-perigo"
-                type="button"
-                onClick={() =>
-                  avaliarSolicitacao(solicitacao.id, "RECUSADA")
-                }
-              >
-                Recusar solicitação
-              </button>
-            </div>
-          </div>
-        )}
-      </article>
-    );
-  }
+  const abaSelecionada = abas.find((aba) => aba.id === abaAtiva);
 
   if (carregando) {
     return (
       <main className="agente-page">
-        <p className="agente-carregando">Carregando área do agente...</p>
+        <div className="agente-carregando">
+          <span className="agente-loading-icon"></span>
+          <p>Carregando painel do agente...</p>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="agente-page">
-      <div className="agente-container">
-        <header className="agente-header">
-          <div>
-            <span className="agente-etiqueta">ALUGACAR</span>
-            <h1>Área do Agente</h1>
-            <p>Bem-vindo, {usuario?.email}!</p>
-            <p>Gerencie os automóveis e avalie as solicitações de aluguel.</p>
-          </div>
-        </header>
+      <Navbar usuario={usuario} tipo="AGENTE" />
 
-        {erro && <p className="agente-erro">{erro}</p>}
-        {mensagem && <p className="agente-sucesso">{mensagem}</p>}
+      <div className="agente-container" id="inicio">
 
-        <section className="agente-section">
-          <div className="agente-section-header">
-            <h2>Cadastrar automóvel</h2>
-            <p>Adicione um veículo ao sistema.</p>
-          </div>
+        {erro && (
+          <Notificacao
+            tipo="erro"
+            mensagem={erro}
+            onFechar={() => setErro("")}
+          />
+        )}
 
-          <form className="agente-form" onSubmit={cadastrarAutomovel}>
-            <div className="agente-form-grid">
-              <div className="agente-campo">
-                <label htmlFor="matricula">Matrícula</label>
-                <input
-                  id="matricula"
-                  type="text"
-                  value={matricula}
-                  onChange={(event) => setMatricula(event.target.value)}
-                  required
-                />
-              </div>
+        {mensagem && (
+          <Notificacao
+            tipo="sucesso"
+            mensagem={mensagem}
+            onFechar={() => setMensagem("")}
+          />
+        )}
 
-              <div className="agente-campo">
-                <label htmlFor="ano">Ano</label>
-                <input
-                  id="ano"
-                  type="number"
-                  min="1900"
-                  value={ano}
-                  onChange={(event) => setAno(event.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="agente-campo">
-                <label htmlFor="marca">Marca</label>
-                <input
-                  id="marca"
-                  type="text"
-                  value={marca}
-                  onChange={(event) => setMarca(event.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="agente-campo">
-                <label htmlFor="modelo">Modelo</label>
-                <input
-                  id="modelo"
-                  type="text"
-                  value={modelo}
-                  onChange={(event) => setModelo(event.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="agente-campo">
-                <label htmlFor="placa">Placa</label>
-                <input
-                  id="placa"
-                  type="text"
-                  value={placa}
-                  onChange={(event) => setPlaca(event.target.value)}
-                  required
-                />
-              </div>
+        <section className="agente-resumo">
+          <article className="agente-resumo-card">
+            <div className="agente-resumo-icone">🚗</div>
+            <div>
+              <span>Automóveis</span>
+              <strong>{automoveis.length}</strong>
+              <small>Veículos cadastrados</small>
             </div>
+          </article>
 
-            <button className="botao-principal" type="submit">
-              Cadastrar automóvel
-            </button>
-          </form>
+          <article className="agente-resumo-card">
+            <div className="agente-resumo-icone pendente">◷</div>
+            <div>
+              <span>Pendentes</span>
+              <strong>{pendentes.length}</strong>
+              <small>Aguardando avaliação</small>
+            </div>
+          </article>
+
+          <article className="agente-resumo-card">
+            <div className="agente-resumo-icone aprovada">✓</div>
+            <div>
+              <span>Aprovadas</span>
+              <strong>{aprovadas.length}</strong>
+              <small>Liberadas para contratação</small>
+            </div>
+          </article>
+
+          <article className="agente-resumo-card">
+            <div className="agente-resumo-icone recusada">×</div>
+            <div>
+              <span>Recusadas</span>
+              <strong>{recusadas.length}</strong>
+              <small>Solicitações recusadas</small>
+            </div>
+          </article>
         </section>
 
-        <section className="agente-section">
-          <div className="agente-section-header">
-            <h2>Automóveis cadastrados</h2>
-            <p>Consulte e gerencie os veículos do sistema.</p>
+        <section className="agente-section" id="automoveis">
+          <div className="agente-section-topo">
+            <div className="agente-section-header">
+              <span className="agente-section-etiqueta">FROTA</span>
+              <h2>Automóveis cadastrados</h2>
+              <p>
+                Visualize e gerencie os veículos disponíveis no sistema.
+              </p>
+            </div>
+
+            <button
+              className="botao-principal"
+              type="button"
+              onClick={() => setModalAutomovel(null)}
+            >
+              <span>+</span> Cadastrar automóvel
+            </button>
           </div>
 
           {automoveis.length === 0 ? (
-            <p className="agente-vazio">Nenhum automóvel cadastrado.</p>
-          ) : (
-            <div className="agente-automoveis-grid">
-              {automoveis.map((automovel) => (
-                <article className="agente-automovel-card" key={automovel.id}>
-                  <div className="automovel-card-topo">
-                    <span className="automovel-etiqueta">
-                      {automovel.ano}
-                    </span>
-                    <span className="automovel-matricula">
-                      {automovel.matricula}
-                    </span>
-                  </div>
-
-                  <h3>{automovel.marca} {automovel.modelo}</h3>
-                  <p><strong>Placa:</strong> {automovel.placa}</p>
-
-                  <div className="automovel-acoes">
-                    <button
-                      className="botao-secundario"
-                      type="button"
-                      onClick={() => iniciarEdicao(automovel)}
-                    >
-                      Editar
-                    </button>
-
-                    <button
-                      className="botao-perigo"
-                      type="button"
-                      onClick={() => excluirAutomovel(automovel.id)}
-                    >
-                      Excluir
-                    </button>
-                  </div>
-
-                  {automovelEdicao === automovel.id && (
-                    <form
-                      className="agente-form agente-form-edicao"
-                      onSubmit={salvarEdicao}
-                    >
-                      <h4>Editar automóvel</h4>
-
-                      <div className="agente-campo">
-                        <label>Ano</label>
-                        <input
-                          type="number"
-                          min="1900"
-                          value={anoEdicao}
-                          onChange={(event) =>
-                            setAnoEdicao(event.target.value)
-                          }
-                          required
-                        />
-                      </div>
-
-                      <div className="agente-campo">
-                        <label>Marca</label>
-                        <input
-                          type="text"
-                          value={marcaEdicao}
-                          onChange={(event) =>
-                            setMarcaEdicao(event.target.value)
-                          }
-                          required
-                        />
-                      </div>
-
-                      <div className="agente-campo">
-                        <label>Modelo</label>
-                        <input
-                          type="text"
-                          value={modeloEdicao}
-                          onChange={(event) =>
-                            setModeloEdicao(event.target.value)
-                          }
-                          required
-                        />
-                      </div>
-
-                      <div className="automovel-acoes">
-                        <button className="botao-principal" type="submit">
-                          Salvar alterações
-                        </button>
-
-                        <button
-                          className="botao-secundario"
-                          type="button"
-                          onClick={cancelarEdicao}
-                        >
-                          Voltar
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </article>
-              ))}
+            <div className="agente-vazio">
+              <span>🚗</span>
+              <h3>Nenhum automóvel cadastrado</h3>
+              <p>
+                Cadastre o primeiro veículo para começar a gerenciar a frota.
+              </p>
             </div>
+          ) : (
+            <>
+              <div className="agente-automoveis-grid">
+                {automoveisPaginados.map((automovel) => (
+                  <article
+                    className="agente-automovel-card"
+                    key={automovel.id}
+                  >
+                    <div className="automovel-card-topo">
+                      <span className="automovel-etiqueta">
+                        {automovel.ano}
+                      </span>
+                      <span className="automovel-matricula">
+                        #{automovel.matricula}
+                      </span>
+                    </div>
+
+                    <div className="automovel-card-info">
+                      <span className="automovel-card-label">VEÍCULO</span>
+                      <h3>
+                        {automovel.marca} {automovel.modelo}
+                      </h3>
+                      <p>
+                        <strong>Placa:</strong> {automovel.placa}
+                      </p>
+                    </div>
+
+                    <div className="automovel-acoes">
+                      <button
+                        className="botao-secundario"
+                        type="button"
+                        onClick={() => setModalAutomovel(automovel)}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        className="botao-perigo"
+                        type="button"
+                        onClick={() => excluirAutomovel(automovel.id)}
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {totalPaginasAutomoveis > 1 && (
+                <div className="automoveis-paginacao">
+                  <button
+                    type="button"
+                    className="paginacao-botao"
+                    disabled={paginaAutomoveis === 1}
+                    onClick={() =>
+                      setPaginaAutomoveis((pagina) => pagina - 1)
+                    }
+                  >
+                    ← Anterior
+                  </button>
+
+                  <span>
+                    Página <strong>{paginaAutomoveis}</strong> de{" "}
+                    <strong>{totalPaginasAutomoveis}</strong>
+                  </span>
+
+                  <button
+                    type="button"
+                    className="paginacao-botao"
+                    disabled={paginaAutomoveis === totalPaginasAutomoveis}
+                    onClick={() =>
+                      setPaginaAutomoveis((pagina) => pagina + 1)
+                    }
+                  >
+                    Próxima →
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
 
-        <section className="agente-section">
+        <section className="agente-section" id="solicitacoes">
           <div className="agente-section-header">
-            <h2>Solicitações pendentes</h2>
-            <p>Solicitações que aguardam análise financeira.</p>
+            <span className="agente-section-etiqueta">ANÁLISE</span>
+            <h2>Solicitações de aluguel</h2>
+            <p>
+              Analise os pedidos dos clientes e acompanhe o andamento
+              das avaliações.
+            </p>
           </div>
 
-          {pendentes.length === 0 ? (
-            <p className="agente-vazio">Não existem solicitações pendentes.</p>
-          ) : (
-            <div className="agente-solicitacoes-grid">
-              {pendentes.map((solicitacao) =>
-                renderSolicitacao(solicitacao, true)
-              )}
-            </div>
-          )}
-        </section>
-
-        <section className="agente-section">
-          <div className="agente-section-header">
-            <h2>Solicitações aprovadas</h2>
-            <p>Solicitações liberadas para contratação.</p>
+          <div
+            className="agente-abas"
+            role="tablist"
+            aria-label="Status das solicitações"
+          >
+            {abas.map((aba) => (
+              <button
+                key={aba.id}
+                id={`aba-${aba.id}`}
+                type="button"
+                role="tab"
+                aria-selected={abaAtiva === aba.id}
+                aria-controls="painel-solicitacoes"
+                className={`agente-aba ${
+                  abaAtiva === aba.id ? "agente-aba-ativa" : ""
+                }`}
+                onClick={() => setAbaAtiva(aba.id)}
+              >
+                <span>{aba.titulo}</span>
+                <span className="agente-aba-contador">
+                  {aba.quantidade}
+                </span>
+              </button>
+            ))}
           </div>
 
-          {aprovadas.length === 0 ? (
-            <p className="agente-vazio">Não existem solicitações aprovadas.</p>
-          ) : (
-            <div className="agente-solicitacoes-grid">
-              {aprovadas.map((solicitacao) =>
-                renderSolicitacao(solicitacao)
-              )}
+          <div
+            id="painel-solicitacoes"
+            className="agente-painel-abas"
+            role="tabpanel"
+            aria-labelledby={`aba-${abaAtiva}`}
+          >
+            <div className="agente-painel-descricao">
+              <h3>{abaSelecionada.titulo}</h3>
+              <p>{abaSelecionada.descricao}</p>
             </div>
-          )}
-        </section>
 
-        <section className="agente-section">
-          <div className="agente-section-header">
-            <h2>Solicitações recusadas</h2>
-            <p>Solicitações que não foram aprovadas.</p>
+            {abaSelecionada.dados.length === 0 ? (
+              <div className="agente-vazio">
+                <span>📋</span>
+                <h3>Nenhuma solicitação encontrada</h3>
+                <p>
+                  Não existem solicitações nesta categoria no momento.
+                </p>
+              </div>
+            ) : (
+              <div className="agente-solicitacoes-grid">
+                {abaSelecionada.dados.map((solicitacao) => (
+                  <CardSolicitacao
+                    key={solicitacao.id}
+                    solicitacao={solicitacao}
+                    mostrarAvaliacao={abaAtiva === "pendentes"}
+                    parecer={pareceres[solicitacao.id]}
+                    onParecerChange={(id, valor) =>
+                      setPareceres((anteriores) => ({
+                        ...anteriores,
+                        [id]: valor
+                      }))
+                    }
+                    onAvaliar={avaliarSolicitacao}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-
-          {recusadas.length === 0 ? (
-            <p className="agente-vazio">Não existem solicitações recusadas.</p>
-          ) : (
-            <div className="agente-solicitacoes-grid">
-              {recusadas.map((solicitacao) =>
-                renderSolicitacao(solicitacao)
-              )}
-            </div>
-          )}
         </section>
+
+        {modalAutomovel !== undefined && (
+          <AutomovelModal
+            automovel={modalAutomovel}
+            onFechar={() => setModalAutomovel(undefined)}
+            onSalvar={salvarAutomovel}
+          />
+        )}
+
+        <footer className="agente-footer">
+          <span>ALUGACAR</span>
+          <p>Painel de gerenciamento de operações</p>
+        </footer>
       </div>
     </main>
   );

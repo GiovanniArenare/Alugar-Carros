@@ -1,0 +1,130 @@
+.solicitacao-card {
+  padding: 24px;
+  margin-bottom: 16px;
+  background: rgba(21, 21, 21, 0.85);
+  border: 1px solid #2B2B2B;
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+
+.solicitacao-card:hover {
+  border-color: #494000;
+}
+
+.solicitacao-card h3 {
+  margin: 0 0 18px;
+  color: #F5F5F5;
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.solicitacao-card p {
+  margin: 10px 0;
+  color: #999999;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.solicitacao-card p strong {
+  color: #F5F5F5;
+}
+
+.solicitacao-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.status-PENDENTE {
+  background: rgba(255, 208, 0, 0.1);
+  border-color: rgba(255, 208, 0, 0.25);
+  color: #FFD000;
+}
+
+.status-EM_ANALISE {
+  background: rgba(65, 145, 220, 0.12);
+  border-color: rgba(65, 145, 220, 0.25);
+  color: #72B9FF;
+}
+
+.status-APROVADA {
+  background: rgba(50, 180, 90, 0.12);
+  border-color: rgba(50, 180, 90, 0.25);
+  color: #65D98A;
+}
+
+.status-RECUSADA {
+  background: rgba(220, 65, 65, 0.12);
+  border-color: rgba(220, 65, 65, 0.25);
+  color: #FF7777;
+}
+
+.status-CANCELADA {
+  background: rgba(150, 150, 150, 0.1);
+  border-color: rgba(150, 150, 150, 0.2);
+  color: #AAAAAA;
+}
+
+.cliente-subform {
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+  padding: 22px;
+  margin-top: 20px;
+  background: #111111;
+  border: 1px solid #383838;
+  border-left: 3px solid #FFD000;
+  border-radius: 8px;
+}
+
+.cliente-subform h4 {
+  margin: 0 0 17px;
+  color: #F5F5F5;
+  font-size: 15px;
+}
+
+.cliente-subform p {
+  color: #999999;
+  font-size: 12px;
+}
+
+.cliente-subform .cliente-form {
+  max-width: 100%;
+}
+
+.solicitacoes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .solicitacao-card {
+    padding: 19px;
+  }
+
+  .solicitacao-acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .solicitacao-acoes button {
+    width: 100%;
+  }
+
+  .cliente-subform {
+    padding: 17px;
+  }
+}

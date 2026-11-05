@@ -6,8 +6,11 @@ import br.com.alugarcarros.sistema.model.ContratoAluguel;
 import br.com.alugarcarros.sistema.model.Usuario;
 import br.com.alugarcarros.sistema.repository.UsuarioRepository;
 import br.com.alugarcarros.sistema.service.ContratoAluguelService;
+import br.com.alugarcarros.sistema.service.ContratoPdfService;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +23,16 @@ import java.util.Map;
 public class ContratoAluguelController {
 
     private final ContratoAluguelService contratoService;
+    private final ContratoPdfService contratoPdfService;
     private final UsuarioRepository usuarioRepository;
 
     public ContratoAluguelController(
         ContratoAluguelService contratoService,
+        ContratoPdfService contratoPdfService,
         UsuarioRepository usuarioRepository
     ) {
         this.contratoService = contratoService;
+        this.contratoPdfService = contratoPdfService;
         this.usuarioRepository = usuarioRepository;
     }
 
@@ -92,6 +98,53 @@ public class ContratoAluguelController {
             }
 
             return ResponseEntity.ok(montarResposta(contrato));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of("erro", e.getMessage())
+            );
+        }
+    }
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<?> baixarPdf(
+        @PathVariable Long id,
+        Authentication autenticacao
+    ) {
+        try {
+            Usuario usuario = usuarioRepository
+                .findByEmail(autenticacao.getName())
+                .orElseThrow(() ->
+                    new IllegalArgumentException("Usuario nao encontrado.")
+                );
+
+            ContratoAluguel contrato =
+                contratoService.buscarPorId(id);
+
+            if ("CLIENTE".equals(usuario.getTipo()) &&
+                    !contrato.getSolicitacao().getCliente().getId()
+                        .equals(usuario.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    Map.of("erro", "Voce nao pode baixar este contrato.")
+                );
+            }
+
+            if (!"CLIENTE".equals(usuario.getTipo()) &&
+                    !"AGENTE".equals(usuario.getTipo())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    Map.of("erro", "Acesso nao autorizado.")
+                );
+            }
+
+            byte[] pdf = contratoPdfService.gerarPdf(contrato);
+
+            return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=contrato-" + id + ".pdf"
+                )
+                .body(pdf);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
