@@ -1,0 +1,10 @@
+stateDiagram-v2
+    [*] --> PENDENTE : cliente cria a solicitação
+    PENDENTE --> PENDENTE : cliente edita
+    PENDENTE --> CANCELADA : cliente cancela
+    PENDENTE --> APROVADA : agente aprova (parecer financeiro)
+    PENDENTE --> RECUSADA : agente recusa (parecer financeiro)
+    APROVADA --> APROVADA : cliente gera contrato de aluguel
+    CANCELADA --> [*]
+    RECUSADA --> [*]
+    APROVADA --> [*]

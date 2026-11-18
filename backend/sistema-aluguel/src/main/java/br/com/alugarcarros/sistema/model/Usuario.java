@@ -17,14 +17,12 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(unique = true, length = 11)
-    private String cpf;
-
     @Column(nullable = false)
     private String senha;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String tipo;
+    private TipoUsuario tipo;
 
     @Column(nullable = false)
     private LocalDateTime dataCadastro;
@@ -63,14 +61,6 @@ public class Usuario {
         this.email = email;
     }
 
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
     public String getSenha() {
         return senha;
     }
@@ -79,11 +69,11 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public String getTipo() {
+    public TipoUsuario getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoUsuario tipo) {
         this.tipo = tipo;
     }
 
@@ -94,4 +84,4 @@ public class Usuario {
     public void setDataCadastro(LocalDateTime dataCadastro) {
         this.dataCadastro = dataCadastro;
     }
-}
+}

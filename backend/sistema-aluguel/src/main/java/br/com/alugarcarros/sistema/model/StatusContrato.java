@@ -5,4 +5,4 @@ public enum StatusContrato {
     EM_EXECUCAO,
     FINALIZADO,
     CANCELADO
-}
+}

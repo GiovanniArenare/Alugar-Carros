@@ -1,0 +1,34 @@
+flowchart LR
+    Cliente(["👤 Cliente"])
+    Agente(["🧑‍💼 Agente"])
+
+    subgraph Sistema["AlugaCar"]
+        UC1(["Cadastrar-se (dados pessoais, endereço e rendimentos)"])
+        UC2(["Fazer login / logout"])
+        UC3(["Consultar automóveis"])
+        UC4(["Solicitar aluguel"])
+        UC5(["Editar ou cancelar solicitação pendente"])
+        UC6(["Acompanhar solicitações"])
+        UC7(["Gerar contrato de aluguel"])
+        UC8(["Baixar contrato em PDF"])
+        UC9(["Gerenciar automóveis"])
+        UC10(["Avaliar solicitação (parecer financeiro)"])
+        UC11(["Gerenciar bancos e empresas"])
+        UC12(["Registrar contrato de crédito"])
+    end
+
+    Cliente --- UC1
+    Cliente --- UC2
+    Cliente --- UC3
+    Cliente --- UC4
+    Cliente --- UC5
+    Cliente --- UC6
+    Cliente --- UC7
+    Cliente --- UC8
+
+    Agente --- UC2
+    Agente --- UC9
+    Agente --- UC10
+    Agente --- UC11
+    Agente --- UC12
+    Agente --- UC8

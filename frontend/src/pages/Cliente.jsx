@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { buscarUsuarioAtual, API_URL } from "../services/api";
+import { requisicao } from "../services/http";
 
 import Navbar from "../components/Navbar";
 import Notificacao from "../components/Notificacao";
@@ -35,9 +36,9 @@ function Cliente() {
   const [dataFimEdicao, setDataFimEdicao] = useState("");
 
   const [solicitacaoContrato, setSolicitacaoContrato] = useState(null);
-  const [nomeContratante, setNomeContratante] = useState("");
-  const [profissao, setProfissao] = useState("");
-  const [rendaMensal, setRendaMensal] = useState("");
+  const [empresaId, setEmpresaId] = useState("");
+  const [valorTotal, setValorTotal] = useState("");
+  const [empresas, setEmpresas] = useState([]);
   const [contratos, setContratos] = useState({});
 
   function notificarErro(mensagemErro) {
@@ -82,6 +83,13 @@ function Cliente() {
       setAutomoveis(dadosAutomoveis);
 
       await carregarSolicitacoes();
+
+      // Empresas são opcionais no contrato; falha aqui não bloqueia a tela.
+      try {
+        setEmpresas(await requisicao("/empresas"));
+      } catch {
+        setEmpresas([]);
+      }
     } catch (error) {
       notificarErro(error.message || "Erro ao carregar os dados.");
     } finally {
@@ -204,28 +212,22 @@ function Cliente() {
 
   async function gerarContrato(solicitacaoId) {
     try {
-      const resposta = await fetch(`${API_URL}/contratos`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      // Nome, profissão e renda são obtidos do cadastro do cliente.
+      await requisicao(
+        "/contratos",
+        {
+          method: "POST",
+          body: {
+            solicitacaoId,
+            empresaId: empresaId ? Number(empresaId) : null,
+            valorTotal: valorTotal ? Number(valorTotal) : null
+          }
         },
-        credentials: "include",
-        body: JSON.stringify({
-          solicitacaoId,
-          nomeContratante,
-          profissao,
-          rendaMensal: Number(rendaMensal)
-        })
-      });
+        "Erro ao gerar contrato."
+      );
 
-      if (!resposta.ok) {
-        const mensagemErro = await resposta.text();
-        throw new Error(mensagemErro || "Erro ao gerar contrato.");
-      }
-
-      setNomeContratante("");
-      setProfissao("");
-      setRendaMensal("");
+      setEmpresaId("");
+      setValorTotal("");
       setSolicitacaoContrato(null);
 
       await consultarContrato(solicitacaoId);
@@ -399,12 +401,11 @@ function Cliente() {
                     baixarContrato={baixarContrato}
                     solicitacaoContrato={solicitacaoContrato}
                     setSolicitacaoContrato={setSolicitacaoContrato}
-                    nomeContratante={nomeContratante}
-                    setNomeContratante={setNomeContratante}
-                    profissao={profissao}
-                    setProfissao={setProfissao}
-                    rendaMensal={rendaMensal}
-                    setRendaMensal={setRendaMensal}
+                    empresas={empresas}
+                    empresaId={empresaId}
+                    setEmpresaId={setEmpresaId}
+                    valorTotal={valorTotal}
+                    setValorTotal={setValorTotal}
                     gerarContrato={gerarContrato}
                   />
                 ))}

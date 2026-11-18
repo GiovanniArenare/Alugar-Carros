@@ -1,143 +1,129 @@
 package br.com.alugarcarros.sistema.service;
 
+import br.com.alugarcarros.sistema.dto.CadastroAgenteRequest;
+import br.com.alugarcarros.sistema.dto.CadastroClienteRequest;
+import br.com.alugarcarros.sistema.dto.EnderecoRequest;
+import br.com.alugarcarros.sistema.dto.RendimentoRequest;
+import br.com.alugarcarros.sistema.model.Cliente;
+import br.com.alugarcarros.sistema.model.Endereco;
+import br.com.alugarcarros.sistema.model.Rendimento;
+import br.com.alugarcarros.sistema.model.TipoUsuario;
 import br.com.alugarcarros.sistema.model.Usuario;
+import br.com.alugarcarros.sistema.repository.ClienteRepository;
 import br.com.alugarcarros.sistema.repository.UsuarioRepository;
+import br.com.alugarcarros.sistema.util.Validadores;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final ClienteRepository clienteRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(
+        UsuarioRepository usuarioRepository,
+        ClienteRepository clienteRepository
+    ) {
         this.usuarioRepository = usuarioRepository;
+        this.clienteRepository = clienteRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public Usuario cadastrarCliente(Usuario usuario) {
-        return cadastrar(usuario, "CLIENTE");
-    }
+    @Transactional
+    public Usuario cadastrarCliente(CadastroClienteRequest dados) {
 
-    public Usuario cadastrarAgente(Usuario usuario) {
-        return cadastrar(usuario, "AGENTE");
-    }
+        Usuario usuario = criarUsuario(
+            dados.nome(), dados.email(), dados.senha(), TipoUsuario.CLIENTE
+        );
 
-    private Usuario cadastrar(Usuario usuario, String tipo) {
+        String cpf = Validadores.somenteDigitos(dados.cpf());
 
-        if (usuario.getNome() == null || usuario.getNome().isBlank()) {
-            throw new IllegalArgumentException("O nome e obrigatorio.");
+        if (cpf.isBlank()) {
+            throw new IllegalArgumentException("O CPF e obrigatorio.");
         }
 
-        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
-            throw new IllegalArgumentException("O email e obrigatorio.");
+        if (!Validadores.cpfValido(cpf)) {
+            throw new IllegalArgumentException("O CPF informado e invalido.");
         }
 
-        if (usuario.getSenha() == null || usuario.getSenha().length() < 8) {
+        if (clienteRepository.existsByCpf(cpf)) {
+            throw new IllegalArgumentException("Este CPF ja esta cadastrado.");
+        }
+
+        String rg = dados.rg() == null
+            ? ""
+            : dados.rg().replaceAll("[^0-9A-Za-z]", "").toUpperCase();
+
+        if (rg.length() < 5 || rg.length() > 14) {
+            throw new IllegalArgumentException("Informe um RG valido.");
+        }
+
+        if (dados.profissao() == null || dados.profissao().isBlank()) {
+            throw new IllegalArgumentException("A profissao e obrigatoria.");
+        }
+
+        Cliente cliente = new Cliente();
+        cliente.setCpf(cpf);
+        cliente.setRg(rg);
+        cliente.setProfissao(dados.profissao().trim());
+        cliente.setEndereco(montarEndereco(dados.endereco()));
+
+        List<RendimentoRequest> rendimentos = dados.rendimentos();
+
+        if (rendimentos == null || rendimentos.isEmpty()) {
             throw new IllegalArgumentException(
-                "A senha deve possuir pelo menos 8 caracteres."
+                "Informe ao menos um rendimento."
             );
         }
 
-        usuario.setEmail(usuario.getEmail().trim().toLowerCase());
-
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+        if (rendimentos.size() > Cliente.MAX_RENDIMENTOS) {
             throw new IllegalArgumentException(
-                "Este email ja esta cadastrado."
+                "Sao permitidos no maximo " + Cliente.MAX_RENDIMENTOS
+                + " rendimentos."
             );
         }
 
-        // CPF obrigatório para clientes
-        if ("CLIENTE".equals(tipo)) {
-
-            if (usuario.getCpf() == null || usuario.getCpf().isBlank()) {
+        for (RendimentoRequest item : rendimentos) {
+            if (item == null
+                    || item.entidadeEmpregadora() == null
+                    || item.entidadeEmpregadora().isBlank()) {
                 throw new IllegalArgumentException(
-                    "O CPF e obrigatorio."
+                    "Informe a entidade empregadora de cada rendimento."
                 );
             }
 
-            String cpf = usuario.getCpf().replaceAll("\\D", "");
-
-            if (!cpfValido(cpf)) {
+            if (item.valor() == null
+                    || item.valor().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException(
-                    "O CPF informado e invalido."
+                    "O valor de cada rendimento deve ser maior que zero."
                 );
             }
 
-            if (usuarioRepository.existsByCpf(cpf)) {
-                throw new IllegalArgumentException(
-                    "Este CPF ja esta cadastrado."
-                );
-            }
-
-            usuario.setCpf(cpf);
-
-        } else {
-            // Agentes podem não possuir CPF cadastrado.
-            if (usuario.getCpf() != null && !usuario.getCpf().isBlank()) {
-
-                String cpf = usuario.getCpf().replaceAll("\\D", "");
-
-                if (!cpfValido(cpf)) {
-                    throw new IllegalArgumentException(
-                        "O CPF informado e invalido."
-                    );
-                }
-
-                if (usuarioRepository.existsByCpf(cpf)) {
-                    throw new IllegalArgumentException(
-                        "Este CPF ja esta cadastrado."
-                    );
-                }
-
-                usuario.setCpf(cpf);
-            } else {
-                usuario.setCpf(null);
-            }
+            cliente.adicionarRendimento(
+                new Rendimento(item.entidadeEmpregadora().trim(), item.valor())
+            );
         }
 
-        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        usuario.setTipo(tipo);
+        Usuario salvo = usuarioRepository.save(usuario);
+        cliente.setUsuario(salvo);
+        clienteRepository.save(cliente);
+
+        return salvo;
+    }
+
+    public Usuario cadastrarAgente(CadastroAgenteRequest dados) {
+        Usuario usuario = criarUsuario(
+            dados.nome(), dados.email(), dados.senha(), TipoUsuario.AGENTE
+        );
 
         return usuarioRepository.save(usuario);
-    }
-
-    private boolean cpfValido(String cpf) {
-
-        if (cpf == null || !cpf.matches("\\d{11}")) {
-            return false;
-        }
-
-        // Rejeita CPFs com todos os números iguais.
-        if (cpf.chars().distinct().count() == 1) {
-            return false;
-        }
-
-        int soma = 0;
-
-        for (int i = 0; i < 9; i++) {
-            soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
-        }
-
-        int resto = soma % 11;
-        int primeiroDigito = resto < 2 ? 0 : 11 - resto;
-
-        if (primeiroDigito != Character.getNumericValue(cpf.charAt(9))) {
-            return false;
-        }
-
-        soma = 0;
-
-        for (int i = 0; i < 10; i++) {
-            soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
-        }
-
-        resto = soma % 11;
-        int segundoDigito = resto < 2 ? 0 : 11 - resto;
-
-        return segundoDigito == Character.getNumericValue(cpf.charAt(10));
     }
 
     public Usuario autenticar(String email, String senha) {
@@ -154,5 +140,83 @@ public class UsuarioService {
         }
 
         return usuario;
+    }
+
+    private Usuario criarUsuario(
+        String nome,
+        String email,
+        String senha,
+        TipoUsuario tipo
+    ) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("O nome e obrigatorio.");
+        }
+
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("O email e obrigatorio.");
+        }
+
+        if (senha == null || senha.length() < 8) {
+            throw new IllegalArgumentException(
+                "A senha deve possuir pelo menos 8 caracteres."
+            );
+        }
+
+        String emailNormalizado = email.trim().toLowerCase();
+
+        if (usuarioRepository.existsByEmail(emailNormalizado)) {
+            throw new IllegalArgumentException("Este email ja esta cadastrado.");
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(nome.trim());
+        usuario.setEmail(emailNormalizado);
+        usuario.setSenha(passwordEncoder.encode(senha));
+        usuario.setTipo(tipo);
+
+        return usuario;
+    }
+
+    private Endereco montarEndereco(EnderecoRequest dados) {
+
+        if (dados == null) {
+            throw new IllegalArgumentException("O endereco e obrigatorio.");
+        }
+
+        String cep = Validadores.somenteDigitos(dados.cep());
+
+        if (cep.length() != 8) {
+            throw new IllegalArgumentException("Informe um CEP valido.");
+        }
+
+        exigir(dados.logradouro(), "O logradouro e obrigatorio.");
+        exigir(dados.numero(), "O numero do endereco e obrigatorio.");
+        exigir(dados.bairro(), "O bairro e obrigatorio.");
+        exigir(dados.cidade(), "A cidade e obrigatoria.");
+
+        if (dados.uf() == null || !dados.uf().trim().matches("[A-Za-z]{2}")) {
+            throw new IllegalArgumentException("Informe a UF com 2 letras.");
+        }
+
+        Endereco endereco = new Endereco();
+        endereco.setCep(cep);
+        endereco.setLogradouro(dados.logradouro().trim());
+        endereco.setNumero(dados.numero().trim());
+        endereco.setComplemento(
+            dados.complemento() == null || dados.complemento().isBlank()
+                ? null
+                : dados.complemento().trim()
+        );
+        endereco.setBairro(dados.bairro().trim());
+        endereco.setCidade(dados.cidade().trim());
+        endereco.setUf(dados.uf().trim().toUpperCase());
+
+        return endereco;
+    }
+
+    private void exigir(String valor, String mensagem) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException(mensagem);
+        }
     }
 }

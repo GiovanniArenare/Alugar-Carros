@@ -1,0 +1,118 @@
+classDiagram
+    direction LR
+
+    class TipoUsuario {
+        <<enumeration>>
+        CLIENTE
+        AGENTE
+    }
+    class StatusSolicitacao {
+        <<enumeration>>
+        PENDENTE
+        EM_ANALISE
+        APROVADA
+        RECUSADA
+        CANCELADA
+    }
+    class StatusContrato {
+        <<enumeration>>
+        AGUARDANDO_ASSINATURA
+        EM_EXECUCAO
+        FINALIZADO
+        CANCELADO
+    }
+
+    class Usuario {
+        Long id
+        String nome
+        String email
+        String senha
+        TipoUsuario tipo
+        LocalDateTime dataCadastro
+    }
+    class Cliente {
+        Long id
+        String cpf
+        String rg
+        String profissao
+        Endereco endereco
+        getRendaTotal() BigDecimal
+    }
+    class Endereco {
+        <<embeddable>>
+        String cep
+        String logradouro
+        String numero
+        String complemento
+        String bairro
+        String cidade
+        String uf
+    }
+    class Rendimento {
+        Long id
+        String entidadeEmpregadora
+        BigDecimal valor
+    }
+    class Automovel {
+        Long id
+        String matricula
+        Integer ano
+        String marca
+        String modelo
+        String placa
+    }
+    class SolicitacaoAluguel {
+        Long id
+        LocalDate dataInicio
+        LocalDate dataFim
+        StatusSolicitacao status
+        String parecerFinanceiro
+        LocalDateTime dataCriacao
+        LocalDateTime dataAvaliacao
+    }
+    class ContratoAluguel {
+        Long id
+        String nomeContratante
+        String profissao
+        BigDecimal rendaMensal
+        BigDecimal valorTotal
+        StatusContrato status
+        LocalDateTime dataCriacao
+    }
+    class Empresa {
+        Long id
+        String razaoSocial
+        String cnpj
+    }
+    class Banco {
+        Long id
+        String nome
+        String codigo
+        String cnpj
+    }
+    class ContratoCredito {
+        Long id
+        BigDecimal valorFinanciado
+        BigDecimal taxaJurosMensal
+        Integer numeroParcelas
+        BigDecimal valorParcela
+        StatusContrato status
+        LocalDateTime dataCriacao
+    }
+
+    Usuario "1" --> "1" TipoUsuario : tipo
+    Usuario "1" -- "0..1" Cliente : perfil do cliente
+    Cliente *-- "1" Endereco
+    Cliente "1" *-- "1..3" Rendimento : rendimentos
+    Usuario "1" --> "0..*" Automovel : proprietário
+    Usuario "1" --> "0..*" SolicitacaoAluguel : cliente
+    Usuario "0..1" <-- "0..*" SolicitacaoAluguel : agente avaliador
+    Automovel "1" <-- "0..*" SolicitacaoAluguel
+    SolicitacaoAluguel "1" -- "0..1" ContratoAluguel
+    SolicitacaoAluguel --> StatusSolicitacao
+    ContratoAluguel --> StatusContrato
+    ContratoAluguel "0..*" --> "0..1" Empresa : empresa locadora
+    ContratoAluguel "1" -- "0..1" ContratoCredito
+    ContratoCredito "0..*" --> "1" Banco : concedido por
+    ContratoCredito "0..*" --> "1" Usuario : agente responsável
+    ContratoCredito --> StatusContrato

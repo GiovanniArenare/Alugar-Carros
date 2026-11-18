@@ -18,12 +18,11 @@ function SolicitacaoCliente({
   baixarContrato,
   solicitacaoContrato,
   setSolicitacaoContrato,
-  nomeContratante,
-  setNomeContratante,
-  profissao,
-  setProfissao,
-  rendaMensal,
-  setRendaMensal,
+  empresas = [],
+  empresaId,
+  setEmpresaId,
+  valorTotal,
+  setValorTotal,
   gerarContrato
 }) {
   return (
@@ -49,11 +48,13 @@ function SolicitacaoCliente({
         </p>
       )}
 
+
       {/* AÇÕES PARA SOLICITAÇÕES PENDENTES */}
       {solicitacao.status === "PENDENTE" && (
         <div className="solicitacao-acoes">
           <button
             type="button"
+            className="botao-editar"
             onClick={() => iniciarEdicao(solicitacao)}
           >
             Editar solicitação
@@ -68,6 +69,7 @@ function SolicitacaoCliente({
           </button>
         </div>
       )}
+
 
       {/* FORMULÁRIO DE EDIÇÃO */}
       {solicitacaoEdicao === solicitacao.id && (
@@ -147,6 +149,10 @@ function SolicitacaoCliente({
                 Profissão: {contratos[solicitacao.id].profissao}
               </p>
 
+              {contratos[solicitacao.id].empresa && (
+                <p>Empresa: {contratos[solicitacao.id].empresa}</p>
+              )}
+
               <p>
                 Status: {contratos[solicitacao.id].status}
               </p>
@@ -162,8 +168,10 @@ function SolicitacaoCliente({
             </div>
           ) : (
             <>
+
               <button
                 type="button"
+                className="botao-consultar"
                 onClick={() => consultarContrato(solicitacao.id)}
               >
                 Consultar contrato
@@ -171,10 +179,12 @@ function SolicitacaoCliente({
 
               <button
                 type="button"
+                className="botao-gerar"
                 onClick={() => setSolicitacaoContrato(solicitacao.id)}
               >
                 Gerar contrato
               </button>
+
             </>
           )}
         </div>
@@ -184,37 +194,47 @@ function SolicitacaoCliente({
       {solicitacaoContrato === solicitacao.id && (
         <form
           className="cliente-form cliente-subform"
-          onSubmit={gerarContrato}
+          onSubmit={(event) => {
+            event.preventDefault();
+            gerarContrato(solicitacao.id);
+          }}
         >
           <h4>Dados do contrato</h4>
 
-          <label>Nome do contratante:</label>
+          <p>
+            Seus dados (nome, CPF, RG, endereço, profissão e rendimentos)
+            serão obtidos do seu cadastro.
+          </p>
+
+          <label htmlFor={`empresa-${solicitacao.id}`}>
+            Empresa locadora (opcional):
+          </label>
+
+          <select
+            id={`empresa-${solicitacao.id}`}
+            value={empresaId}
+            onChange={(event) => setEmpresaId(event.target.value)}
+          >
+            <option value="">Nenhuma</option>
+
+            {empresas.map((empresa) => (
+              <option key={empresa.id} value={empresa.id}>
+                {empresa.razaoSocial}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor={`valor-total-${solicitacao.id}`}>
+            Valor total (opcional):
+          </label>
 
           <input
-            type="text"
-            value={nomeContratante}
-            onChange={(event) =>
-              setNomeContratante(event.target.value)
-            }
-            required
-          />
-
-          <label>Profissão:</label>
-
-          <input
-            type="text"
-            value={profissao}
-            onChange={(event) => setProfissao(event.target.value)}
-          />
-
-          <label>Renda mensal:</label>
-
-          <input
+            id={`valor-total-${solicitacao.id}`}
             type="number"
-            min="0"
+            min="0.01"
             step="0.01"
-            value={rendaMensal}
-            onChange={(event) => setRendaMensal(event.target.value)}
+            value={valorTotal}
+            onChange={(event) => setValorTotal(event.target.value)}
           />
 
           <button type="submit">Confirmar contrato</button>

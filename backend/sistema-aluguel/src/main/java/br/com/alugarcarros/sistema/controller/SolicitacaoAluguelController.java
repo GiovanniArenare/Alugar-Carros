@@ -5,6 +5,7 @@ import br.com.alugarcarros.sistema.dto.SolicitacaoAluguelRequest;
 import br.com.alugarcarros.sistema.dto.AvaliacaoSolicitacaoRequest;
 import br.com.alugarcarros.sistema.model.SolicitacaoAluguel;
 import br.com.alugarcarros.sistema.model.StatusSolicitacao;
+import br.com.alugarcarros.sistema.model.TipoUsuario;
 import br.com.alugarcarros.sistema.model.Usuario;
 import br.com.alugarcarros.sistema.repository.UsuarioRepository;
 import br.com.alugarcarros.sistema.service.SolicitacaoAluguelService;
@@ -101,7 +102,7 @@ public class SolicitacaoAluguelController {
         Usuario cliente = usuarioRepository.findByEmail(autenticacao.getName())
             .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
 
-        if (!"CLIENTE".equals(cliente.getTipo())) {
+        if (cliente.getTipo() != TipoUsuario.CLIENTE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 Map.of("erro", "Apenas clientes podem consultar suas solicitacoes.")
             );
@@ -121,7 +122,7 @@ public class SolicitacaoAluguelController {
         Usuario agente = usuarioRepository.findByEmail(autenticacao.getName())
             .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
 
-        if (!"AGENTE".equals(agente.getTipo())) {
+        if (agente.getTipo() != TipoUsuario.AGENTE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 Map.of("erro", "Apenas agentes podem consultar solicitacoes pendentes.")
             );
@@ -141,7 +142,7 @@ public class SolicitacaoAluguelController {
         Usuario agente = usuarioRepository.findByEmail(autenticacao.getName())
             .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
 
-        if (!"AGENTE".equals(agente.getTipo())) {
+        if (agente.getTipo() != TipoUsuario.AGENTE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 Map.of("erro", "Apenas agentes podem consultar solicitacoes aprovadas.")
             );
@@ -161,7 +162,7 @@ public class SolicitacaoAluguelController {
         Usuario agente = usuarioRepository.findByEmail(autenticacao.getName())
             .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
 
-        if (!"AGENTE".equals(agente.getTipo())) {
+        if (agente.getTipo() != TipoUsuario.AGENTE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 Map.of("erro", "Apenas agentes podem consultar solicitacoes recusadas.")
             );

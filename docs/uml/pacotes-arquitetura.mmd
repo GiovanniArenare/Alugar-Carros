@@ -1,0 +1,27 @@
+flowchart TB
+    subgraph Frontend["Frontend — React + Vite"]
+        Paginas["pages: Login, Cadastro, Cliente, Agente"]
+        Componentes["components (inclui components/agente)"]
+        Hooks["hooks: useAgente, useNotificacoes"]
+        Servicos["services: api, http, agenteApi"]
+    end
+
+    subgraph Backend["Backend — Spring Boot"]
+        Controllers["controller: Usuario, Automovel, Solicitacao, Contrato, ContratoCredito, Banco, Empresa"]
+        Services["service: regras de negócio, PDF"]
+        Repos["repository (Spring Data JPA)"]
+        Models["model: entidades e enums"]
+        Config["config: Spring Security + CORS"]
+    end
+
+    DB[("PostgreSQL / Supabase")]
+
+    Paginas --> Componentes
+    Paginas --> Hooks
+    Hooks --> Servicos
+    Servicos -- "HTTP / JSON + cookie de sessão" --> Controllers
+    Controllers --> Services
+    Services --> Repos
+    Repos --> Models
+    Repos --> DB
+    Config -.-> Controllers

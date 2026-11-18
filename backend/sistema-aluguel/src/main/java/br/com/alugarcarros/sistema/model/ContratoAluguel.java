@@ -25,6 +25,13 @@ public class ContratoAluguel {
 
     private BigDecimal rendaMensal;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
+
+    @Column(precision = 14, scale = 2)
+    private BigDecimal valorTotal;
+
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
 
@@ -60,6 +67,12 @@ public class ContratoAluguel {
 
     public BigDecimal getRendaMensal() { return rendaMensal; }
     public void setRendaMensal(BigDecimal rendaMensal) { this.rendaMensal = rendaMensal; }
+
+    public Empresa getEmpresa() { return empresa; }
+    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
+
+    public BigDecimal getValorTotal() { return valorTotal; }
+    public void setValorTotal(BigDecimal valorTotal) { this.valorTotal = valorTotal; }
 
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }

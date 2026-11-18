@@ -1,7 +1,10 @@
 
 package br.com.alugarcarros.sistema.service;
 
+import br.com.alugarcarros.sistema.model.Cliente;
 import br.com.alugarcarros.sistema.model.ContratoAluguel;
+import br.com.alugarcarros.sistema.model.ContratoCredito;
+import br.com.alugarcarros.sistema.model.Rendimento;
 import br.com.alugarcarros.sistema.model.SolicitacaoAluguel;
 
 import com.lowagie.text.Document;
@@ -27,7 +30,20 @@ public class ContratoPdfService {
     private static final DateTimeFormatter FORMATO_DATA =
             DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public byte[] gerarPdf(ContratoAluguel contrato) {
+    private static String formatarCpf(String cpf) {
+        if (cpf == null || cpf.length() != 11) {
+            return cpf;
+        }
+
+        return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "."
+            + cpf.substring(6, 9) + "-" + cpf.substring(9);
+    }
+
+    public byte[] gerarPdf(
+            ContratoAluguel contrato,
+            Cliente cliente,
+            ContratoCredito credito
+    ) {
 
         ByteArrayOutputStream saida = new ByteArrayOutputStream();
 
@@ -73,8 +89,25 @@ public class ContratoPdfService {
             ));
 
             documento.add(new Paragraph(
-                    "CPF: " + solicitacao.getCliente().getCpf(), texto
+                    "CPF: " + formatarCpf(cliente.getCpf()), texto
             ));
+
+            documento.add(new Paragraph("RG: " + cliente.getRg(), texto));
+
+            documento.add(new Paragraph(
+                    "Endereço: " + cliente.getEndereco().formatado(), texto
+            ));
+
+            documento.add(new Paragraph(
+                    "Profissão: " + cliente.getProfissao(), texto
+            ));
+
+            for (Rendimento rendimento : cliente.getRendimentos()) {
+                documento.add(new Paragraph(
+                        "Rendimento (" + rendimento.getEntidadeEmpregadora()
+                        + "): R$ " + rendimento.getValor(), texto
+                ));
+            }
 
             documento.add(new Paragraph(" "));
             documento.add(new Paragraph("2. DADOS DO VEÍCULO", subtitulo));
@@ -111,12 +144,24 @@ public class ContratoPdfService {
             documento.add(new Paragraph(" "));
             documento.add(new Paragraph("4. DADOS DO CONTRATO", subtitulo));
 
-            documento.add(new Paragraph(
-                    "Profissão: " + contratoAtual.getProfissao(), texto
-            ));
+            if (contratoAtual.getEmpresa() != null) {
+                documento.add(new Paragraph(
+                        "Empresa locadora: "
+                        + contratoAtual.getEmpresa().getRazaoSocial()
+                        + " (CNPJ " + contratoAtual.getEmpresa().getCnpj() + ")",
+                        texto
+                ));
+            }
+
+            if (contratoAtual.getValorTotal() != null) {
+                documento.add(new Paragraph(
+                        "Valor total: R$ " + contratoAtual.getValorTotal(), texto
+                ));
+            }
 
             documento.add(new Paragraph(
-                    "Renda mensal: R$ " + contratoAtual.getRendaMensal(), texto
+                    "Renda mensal declarada: R$ "
+                    + contratoAtual.getRendaMensal(), texto
             ));
 
             documento.add(new Paragraph(
@@ -124,7 +169,37 @@ public class ContratoPdfService {
             ));
 
             documento.add(new Paragraph(" "));
-            documento.add(new Paragraph("5. DISPOSIÇÕES GERAIS", subtitulo));
+            if (credito != null) {
+                documento.add(new Paragraph("5. CONTRATO DE CRÉDITO", subtitulo));
+
+                documento.add(new Paragraph(
+                        "Banco: " + credito.getBanco().getNome()
+                        + " (código " + credito.getBanco().getCodigo() + ")",
+                        texto
+                ));
+
+                documento.add(new Paragraph(
+                        "Valor financiado: R$ " + credito.getValorFinanciado(),
+                        texto
+                ));
+
+                documento.add(new Paragraph(
+                        "Taxa de juros: " + credito.getTaxaJurosMensal()
+                        + "% ao mês", texto
+                ));
+
+                documento.add(new Paragraph(
+                        credito.getNumeroParcelas() + " parcelas de R$ "
+                        + credito.getValorParcela(), texto
+                ));
+
+                documento.add(new Paragraph(" "));
+            }
+
+            documento.add(new Paragraph(
+                    (credito != null ? "6" : "5") + ". DISPOSIÇÕES GERAIS",
+                    subtitulo
+            ));
 
             documento.add(new Paragraph(
                     "O presente documento registra os dados da solicitação " +

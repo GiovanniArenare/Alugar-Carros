@@ -309,3 +309,67 @@
     font-size: 27px;
   }
 }
+
+/* Seções adicionais do cadastro (endereço e rendimentos) */
+.cadastro-form .form-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #292929;
+  border-radius: 12px;
+  min-width: 0;
+}
+
+.cadastro-form .form-secao legend {
+  padding: 0 8px;
+  color: #ffd000;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cadastro-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.cadastro-form .rendimento-linha {
+  position: relative;
+}
+
+.cadastro-form button.botao-auxiliar {
+  width: auto;
+  align-self: flex-start;
+  padding: 9px 14px;
+  border: 1px dashed #ffd000;
+  background: transparent;
+  color: #ffd000;
+  font-size: 13px;
+}
+
+.cadastro-form button.botao-auxiliar:hover {
+  background: rgba(255, 208, 0, 0.1);
+  transform: none;
+}
+
+.cadastro-form button.botao-remover {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border-style: solid;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .cadastro-form .form-row {
+    grid-template-columns: 1fr;
+  }
+}

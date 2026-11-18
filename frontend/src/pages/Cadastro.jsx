@@ -2,23 +2,33 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { cadastrarUsuario } from "../services/api";
+import { formatarCPF, somenteDigitos } from "../utils/formatadores";
+import EnderecoFields from "../components/EnderecoFields";
+import RendimentosFields from "../components/RendimentosFields";
 import "./Cadastro.css";
 import carro from "../assets/alugar-carro.jpg";
 
-function formatarCPF(valor) {
-  const numeros = valor.replace(/\D/g, "").slice(0, 11);
-
-  return numeros
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-}
+const ENDERECO_INICIAL = {
+  cep: "",
+  logradouro: "",
+  numero: "",
+  complemento: "",
+  bairro: "",
+  cidade: "",
+  uf: ""
+};
 
 function Cadastro() {
   const navigate = useNavigate();
 
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
+  const [rg, setRg] = useState("");
+  const [profissao, setProfissao] = useState("");
+  const [endereco, setEndereco] = useState(ENDERECO_INICIAL);
+  const [rendimentos, setRendimentos] = useState([
+    { entidadeEmpregadora: "", valor: "" }
+  ]);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
@@ -29,7 +39,7 @@ function Cadastro() {
     e.preventDefault();
     setErro("");
 
-    if (cpf.replace(/\D/g, "").length !== 11) {
+    if (somenteDigitos(cpf).length !== 11) {
       setErro("Informe um CPF válido.");
       return;
     }
@@ -44,9 +54,16 @@ function Cadastro() {
 
       await cadastrarUsuario({
         nome,
-        cpf: cpf.replace(/\D/g, ""),
         email,
-        senha
+        senha,
+        cpf: somenteDigitos(cpf),
+        rg,
+        profissao,
+        endereco: { ...endereco, cep: somenteDigitos(endereco.cep) },
+        rendimentos: rendimentos.map((item) => ({
+          entidadeEmpregadora: item.entidadeEmpregadora,
+          valor: Number(item.valor)
+        }))
       });
 
       alert("Conta criada com sucesso! Faça login.");
@@ -101,6 +118,39 @@ function Cadastro() {
                 required
               />
             </div>
+
+            <div className="form-group">
+              <label htmlFor="rg">RG</label>
+              <input
+                type="text"
+                id="rg"
+                placeholder="Digite seu RG"
+                value={rg}
+                onChange={(e) => setRg(e.target.value)}
+                maxLength={20}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="profissao">Profissão</label>
+              <input
+                type="text"
+                id="profissao"
+                placeholder="Ex.: Engenheiro de software"
+                value={profissao}
+                onChange={(e) => setProfissao(e.target.value)}
+                maxLength={100}
+                required
+              />
+            </div>
+
+            <EnderecoFields endereco={endereco} onChange={setEndereco} />
+
+            <RendimentosFields
+              rendimentos={rendimentos}
+              onChange={setRendimentos}
+            />
 
             <div className="form-group">
               <label htmlFor="email">E-mail</label>

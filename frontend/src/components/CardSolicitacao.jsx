@@ -4,7 +4,8 @@ function CardSolicitacao({
   mostrarAvaliacao = false,
   parecer,
   onParecerChange,
-  onAvaliar
+  onAvaliar,
+  onRegistrarCredito
 }) {
   const statusTexto = {
     PENDENTE: "Pendente",
@@ -58,6 +59,18 @@ function CardSolicitacao({
           <p>
             {solicitacao.parecerFinanceiro || "Não informado."}
           </p>
+        </div>
+      )}
+
+      {solicitacao.status === "APROVADA" && onRegistrarCredito && (
+        <div className="solicitacao-acoes">
+          <button
+            className="botao-secundario"
+            type="button"
+            onClick={() => onRegistrarCredito(solicitacao)}
+          >
+            Contrato de crédito
+          </button>
         </div>
       )}
 

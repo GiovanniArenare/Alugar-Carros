@@ -20,7 +20,7 @@ A aplicação busca:
 ## 3. Funcionalidades
 
 ### Área do cliente
-- Cadastro de novos usuários.
+- Cadastro de novos clientes com CPF, RG, profissão, endereço e de 1 a 3 rendimentos (entidade empregadora + valor).
 - Login e autenticação.
 - Visualização dos automóveis disponíveis.
 - Criação de solicitações de aluguel.
@@ -39,10 +39,19 @@ A aplicação busca:
 - Aprovação ou recusa de solicitações.
 - Registro de parecer financeiro.
 
+### Bancos, empresas e crédito
+- Cadastro de bancos e de empresas locadoras (CNPJ validado).
+- Registro do contrato de crédito de um contrato de aluguel (banco, valor, juros e parcelas pela Tabela Price).
+
 ### Gerenciamento de contratos
-- Criação de contratos para solicitações aprovadas.
-- Registro de informações do contratante.
-- Consulta dos contratos associados às solicitações.
+- Criação de contratos para solicitações aprovadas; nome, profissão e renda vêm do cadastro do cliente.
+- Empresa locadora e valor total opcionais.
+- Consulta dos contratos e download em PDF (com dados do cliente, empresa e crédito).
+
+## Documentação
+
+- [Histórias de usuário](docs/historias-de-usuario.md)
+- [Diagramas UML](docs/diagramas-uml.md) (casos de uso, classes, sequência, estados e arquitetura)
 
 ## 4. Tecnologias utilizadas
 
@@ -105,12 +114,20 @@ Alugar-Carros/
 │       ├── pom.xml
 │       └── mvnw.cmd
 │
+├── docs/
+│   ├── historias-de-usuario.md
+│   ├── diagramas-uml.md
+│   └── uml/
+│
 ├── frontend/
 │   ├── public/
 │   ├── src/
 │   │   ├── assets/
+│   │   ├── components/
+│   │   ├── hooks/
 │   │   ├── pages/
 │   │   ├── services/
+│   │   ├── utils/
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── index.css
@@ -151,6 +168,8 @@ $env:APP_ADMIN_KEY="SUA_CHAVE_ADMINISTRATIVA"
 Substitua os valores pelos dados do seu projeto Supabase.
 
 A variável `APP_ADMIN_KEY` é utilizada para proteger o cadastro de agentes.
+
+> **Atualização do esquema:** o projeto usa `ddl-auto=update`. As novas tabelas (`clientes`, `rendimentos_cliente`, `bancos`, `empresas`, `contratos_credito`) são criadas automaticamente. Contas de cliente criadas antes desta versão não possuem RG, endereço e rendimentos; crie novas contas de cliente para testar o contrato.
 
 **Importante:** não compartilhe suas credenciais e não as envie para o GitHub.
 
@@ -225,6 +244,13 @@ Com o backend e o frontend em execução, acesse o endereço do frontend pelo na
 | PUT | `/api/solicitacoes/{id}/avaliacao` | Avaliação financeira |
 | POST | `/api/contratos` | Criação de contrato |
 | GET | `/api/contratos/solicitacao/{id}` | Consulta de contrato |
+| GET | `/api/contratos/{id}/pdf` | Download do contrato em PDF |
+| GET | `/api/bancos` | Listagem de bancos |
+| POST | `/api/bancos` | Cadastro de banco (agente) |
+| GET | `/api/empresas` | Listagem de empresas |
+| POST | `/api/empresas` | Cadastro de empresa (agente) |
+| POST | `/api/contratos-credito` | Registro de contrato de crédito (agente) |
+| GET | `/api/contratos-credito/contrato/{id}` | Consulta do crédito de um contrato |
 
 Os endpoints protegidos exigem autenticação.
 

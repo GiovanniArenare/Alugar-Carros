@@ -38,6 +38,12 @@ public class SecurityConfig {
                     "/api/usuarios/agente",
                     "/api/usuarios/logout"
                 ).permitAll()
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/bancos",
+                    "/api/empresas",
+                    "/api/contratos-credito"
+                ).hasRole("AGENTE")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

@@ -52,7 +52,7 @@ public class SolicitacaoAluguelService {
         Usuario cliente = usuarioRepository.findByEmail(emailCliente)
             .orElseThrow(() -> new IllegalArgumentException("Cliente nao encontrado."));
 
-        if (!"CLIENTE".equals(cliente.getTipo())) {
+        if (cliente.getTipo() != TipoUsuario.CLIENTE) {
             throw new IllegalArgumentException("Apenas clientes podem solicitar alugueis.");
         }
 
@@ -77,7 +77,7 @@ public class SolicitacaoAluguelService {
         Usuario cliente = usuarioRepository.findByEmail(emailCliente)
             .orElseThrow(() -> new IllegalArgumentException("Cliente nao encontrado."));
 
-        if (!"CLIENTE".equals(cliente.getTipo())) {
+        if (cliente.getTipo() != TipoUsuario.CLIENTE) {
             throw new IllegalArgumentException("Apenas clientes podem editar solicitacoes.");
         }
 
@@ -124,7 +124,7 @@ public class SolicitacaoAluguelService {
         Usuario cliente = usuarioRepository.findByEmail(emailCliente)
             .orElseThrow(() -> new IllegalArgumentException("Cliente nao encontrado."));
 
-        if (!"CLIENTE".equals(cliente.getTipo())) {
+        if (cliente.getTipo() != TipoUsuario.CLIENTE) {
             throw new IllegalArgumentException("Apenas clientes podem cancelar solicitacoes.");
         }
 
@@ -161,7 +161,7 @@ public class SolicitacaoAluguelService {
         Usuario agente = usuarioRepository.findByEmail(emailAgente)
             .orElseThrow(() -> new IllegalArgumentException("Agente nao encontrado."));
 
-        if (!"AGENTE".equals(agente.getTipo())) {
+        if (agente.getTipo() != TipoUsuario.AGENTE) {
             throw new IllegalArgumentException("Apenas agentes podem avaliar solicitacoes.");
         }
 

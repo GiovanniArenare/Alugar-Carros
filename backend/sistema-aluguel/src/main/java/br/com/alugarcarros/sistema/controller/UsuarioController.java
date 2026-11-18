@@ -1,6 +1,8 @@
 
 package br.com.alugarcarros.sistema.controller;
 
+import br.com.alugarcarros.sistema.dto.CadastroAgenteRequest;
+import br.com.alugarcarros.sistema.dto.CadastroClienteRequest;
 import br.com.alugarcarros.sistema.dto.LoginRequest;
 import br.com.alugarcarros.sistema.model.Usuario;
 import br.com.alugarcarros.sistema.service.UsuarioService;
@@ -67,10 +69,12 @@ public class UsuarioController {
 
     // Cadastro de cliente
     @PostMapping("/cadastro")
-    public ResponseEntity<?> cadastrar(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> cadastrar(
+        @RequestBody CadastroClienteRequest dados
+    ) {
 
         try {
-            Usuario usuarioSalvo = usuarioService.cadastrarCliente(usuario);
+            Usuario usuarioSalvo = usuarioService.cadastrarCliente(dados);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of(
@@ -92,7 +96,7 @@ public class UsuarioController {
     // Cadastro de agente protegido por chave administrativa
     @PostMapping("/agente")
     public ResponseEntity<?> cadastrarAgente(
-        @RequestBody Usuario usuario,
+        @RequestBody CadastroAgenteRequest dados,
         @RequestHeader(
             value = "X-Codigo-Administrativo",
             required = false
@@ -108,7 +112,7 @@ public class UsuarioController {
         }
 
         try {
-            Usuario usuarioSalvo = usuarioService.cadastrarAgente(usuario);
+            Usuario usuarioSalvo = usuarioService.cadastrarAgente(dados);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of(

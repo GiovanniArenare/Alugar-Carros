@@ -162,3 +162,8 @@
     width: 100%;
   }
 }
+.automovel-modal .erro-mensagem {
+  margin: 0 0 14px;
+  color: #ef7777;
+  font-size: 13px;
+}

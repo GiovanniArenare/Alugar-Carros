@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    actor A as Agente
+    participant F as Frontend (React)
+    participant API as API (Spring Boot)
+    participant DB as PostgreSQL
+
+    C->>F: Seleciona automóvel e período
+    F->>API: POST /api/solicitacoes
+    API->>DB: salva SolicitacaoAluguel (PENDENTE)
+    API-->>F: 201 Created
+
+    A->>F: Abre solicitações pendentes
+    F->>API: GET /api/solicitacoes/pendentes
+    A->>F: Informa parecer e aprova
+    F->>API: PUT /api/solicitacoes/{id}/avaliacao
+    API->>DB: status APROVADA + parecer + agente
+
+    C->>F: Gera contrato
+    F->>API: POST /api/contratos
+    API->>DB: busca Cliente (CPF, RG, endereço, rendimentos)
+    API->>DB: salva ContratoAluguel (AGUARDANDO_ASSINATURA)
+    API-->>F: contrato criado
+
+    A->>F: Registra crédito (banco, valor, juros, parcelas)
+    F->>API: POST /api/contratos-credito
+    API->>API: calcula parcela (Tabela Price)
+    API->>DB: salva ContratoCredito
+    API-->>F: 201 Created
+
+    C->>F: Baixa contrato
+    F->>API: GET /api/contratos/{id}/pdf
+    API-->>F: PDF com dados do cliente, empresa e crédito
