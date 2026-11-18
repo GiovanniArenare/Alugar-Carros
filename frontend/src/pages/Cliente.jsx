@@ -379,7 +379,7 @@ function Cliente() {
             {solicitacoes.length === 0 ? (
               <p>Você ainda não possui solicitações.</p>
             ) : (
-              <div className="solicitacoes-lista">
+              <div className="solicitacoes-grid">
                 {solicitacoes.map((solicitacao) => (
                   <SolicitacaoCliente
                     key={solicitacao.id}
